@@ -55,7 +55,13 @@
 .FilmRow .action:active {
   background-color: rgb(40, 205, 197);
 }
-
+.FilmRow .filmLink {
+  text-decoration: none;
+}
+.FilmRow .action .material-icons {
+  text-decoration: none;
+  color: black;
+}
 
 .FilmRow .film-summary {
   flex-grow: 1;

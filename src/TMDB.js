@@ -1,7 +1,7 @@
 export const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY
-export const TMDB_NO_POSTER_URL = "no-poster-available.jpg"
-export const TMDB_NO_IMAGE_URL = "No_image_available_1280.png"
-export const TMDB_RESTRICTED_X18 = "classification-x18-square.png"
+export const TMDB_NO_POSTER_URL = "/no-poster-available.jpg"
+export const TMDB_NO_IMAGE_URL = "/No_image_available_1280.png"
+export const TMDB_RESTRICTED_X18 = "/classification-x18-square.png"
 export const TMDB_ERRORS = [
     {
         code: 1,

@@ -1,11 +1,10 @@
 import { TMDB_NO_IMAGE_URL, TMDB_NO_POSTER_URL, TMDB_RESTRICTED_X18 } from './TMDB'
 import './FilmDetail.css'
 
-function FilmDetail({filmDetailEmpty, adult, title, tagline, overview, poster_path, posterBaseURL, backdrop_path, backdropBaseURL}) {
-    
+function FilmDetail({adult, title, tagline, overview, poster_path, posterBaseURL, backdrop_path, backdropBaseURL}) {    
   return (
     // Check if there is no film selected, then call FilmDetailEmpty(). Otherwise, show the film details
-    filmDetailEmpty
+    !title
       ?
         FilmDetailEmpty()
       :
@@ -41,6 +40,7 @@ function FilmDetail({filmDetailEmpty, adult, title, tagline, overview, poster_pa
 function FilmDetailEmpty() {
   return (
     <div className="FilmDetail">
+      <h1 className="section-title">No Film Selected</h1>
     <p>
       <i className="material-icons">subscriptions</i>
       <span>No film selected</span>

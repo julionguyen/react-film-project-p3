@@ -3,6 +3,7 @@ import FilmDetail from "./FilmDetail";
 import './FilmLibrary.css';
 import FilmRow from "./FilmRow";
 import {TMDB_API_KEY} from "./TMDB";
+import { useParams } from "react-router-dom";
 
 function FilmLibrary() {
 
@@ -15,7 +16,9 @@ function FilmLibrary() {
   const [page, setPage]  = useState(1)  
   const [totalFilms, setTotalFilms] = useState(0)
   const [filmTMDB, setFilmTMDB] = useState([])
-  const [year, setYear] = useState(2022)
+  const [year, setYear] = useState(()=>{ 
+    return new Date().getFullYear()    
+  })
   const [hasMore, setHasMore] = useState(true)
   const filmRef = useRef(null)
 
@@ -36,7 +39,7 @@ function FilmLibrary() {
                 setTotalFilms(res.total_results)
                 if (page < res.total_pages) setPage(page+1)
               }
-            })            
+            })
           } else {
             // Stop fetching more movies if error occurred (ok === false)
             setHasMore(false)
@@ -48,7 +51,7 @@ function FilmLibrary() {
   }  
 
   // Trigger when the page reaches the end
-  function onIntersection (entries) {    
+  const onIntersection = entries => {    
     const firstEntry = entries[0]    
     if (firstEntry.isIntersecting && hasMore) {
       GetFilmFromTMDB()
@@ -56,7 +59,7 @@ function FilmLibrary() {
   }
   useEffect(()=>{
     
-    const obs = new IntersectionObserver(onIntersection)    
+    const obs = new IntersectionObserver(onIntersection)
     if (obs && filmRef.current) {
       obs.observe(filmRef.current)
     }
@@ -87,23 +90,22 @@ function FilmLibrary() {
   }
 
   const handleSelectFilm = filmID => {
-    
+    const url=`https://api.themoviedb.org/3/movie/${filmID}?api_key=${TMDB_API_KEY}`
+
     try {
-      
-      const url=`https://api.themoviedb.org/3/movie/${filmID}?api_key=${TMDB_API_KEY}`
-      fetch(url)      
+      fetch(url)
         .then(res => {          
           if (res.ok) {
             res.json()
             .then( res => {              
               selectAllView ? setSelectedAllFilm(res) : setSelectedFavFilm(res)
-            }).catch(err => { console.log(err)})
+            }).catch(err => { console.log('Error while fetching data:', err)})
           } else {
-            console.log("Error: ", res.status)
+            console.log(res)
           }
         })
     } catch(error) {
-      console.log("Error: ", error)
+      console.log("Error code: ", error.status)
     }
     
     
@@ -139,6 +141,12 @@ function FilmLibrary() {
   // Trigger when DidMount
   useEffect(()=>getTMDBConfig,[])
 
+  // Process the URL to get filmID, return undefined if no filmID passed through URL
+  const param = useParams()  
+  if (param !== undefined && param.filmID !== undefined) {
+    // Only proceed when user did not click over the FAVES tab.
+    selectAllView &&  handleSelectFilm(param.filmID) 
+  }
   return (
     TMDB_API_KEY
     ?
@@ -170,6 +178,7 @@ function FilmLibrary() {
             <>
               {filmTMDB.map((film, index) =>          
                 <FilmRow key={index}
+                    id={film.id}
                     adult={film.adult}
                     imgURL={film.poster_path}
                     title={film.title}
@@ -186,6 +195,7 @@ function FilmLibrary() {
           :
           favFilms.map((favFilm, index) =>
             <FilmRow key={index}
+              id={favFilm.id}
               adult={favFilm.adult}
               imgURL={favFilm.poster_path}
               title={favFilm.title}
@@ -201,43 +211,36 @@ function FilmLibrary() {
         
       </div>
 
-      <div className="film-details">
-        
-        { (selectAllView && selectedAllFilm === null) || (!selectAllView && selectedFavFilm == null)
+      <div className="film-details">        
+        {selectAllView
           ?
-            <FilmDetail filmDetailEmpty={true} />
-          : selectAllView 
-            ?
-              <>
-                <h1 className="section-title">{selectedAllFilm.title}</h1>
-                <FilmDetail
-                  filmDetailEmpty={false}
-                  adult={selectedAllFilm.adult}
-                  title={selectedAllFilm.title}
-                  tagline={selectedAllFilm.tagline}
-                  overview={selectedAllFilm.overview}
-                  poster_path={selectedAllFilm.poster_path}
-                  posterBaseURL={posterBaseURL}
-                  backdrop_path={selectedAllFilm.backdrop_path}
-                  backdropBaseURL={backdropBaseURL}
-                />
-              </>
-            :
+            <>              
+              <h1 className="section-title">{selectedAllFilm !== null && selectedAllFilm.title}</h1>              
+              <FilmDetail                  
+                adult={selectedAllFilm !== null && selectedAllFilm.adult}
+                title={selectedAllFilm !== null && selectedAllFilm.title}
+                tagline={selectedAllFilm !== null && selectedAllFilm.tagline}
+                overview={selectedAllFilm !== null && selectedAllFilm.overview}
+                poster_path={selectedAllFilm !== null && selectedAllFilm.poster_path}
+                posterBaseURL={selectedAllFilm !== null && posterBaseURL}
+                backdrop_path={selectedAllFilm !== null && selectedAllFilm.backdrop_path}
+                backdropBaseURL={selectedAllFilm !== null && backdropBaseURL}
+              />            
+            </>            
+          :           
             <>
-            <h1 className="section-title">{selectedFavFilm.title}</h1>
-            <FilmDetail
-              filmDetailEmpty={false}
-              adult={selectedFavFilm.adult}
-              title={selectedFavFilm.title}
-              tagline={selectedFavFilm.tagline}
-              overview={selectedFavFilm.overview}
-              poster_path={selectedFavFilm.poster_path}
-              posterBaseURL={posterBaseURL}
-              backdrop_path={selectedFavFilm.backdrop_path}
-              backdropBaseURL={backdropBaseURL}
-            />
-          </>
-    }
+            <h1 className="section-title">{selectedFavFilm !== null && selectedFavFilm.title}</h1>
+              <FilmDetail              
+                adult={selectedFavFilm !== null && selectedFavFilm.adult}
+                title={selectedFavFilm !== null && selectedFavFilm.title}
+                tagline={selectedFavFilm !== null && selectedFavFilm.tagline}
+                overview={selectedFavFilm !== null && selectedFavFilm.overview}
+                poster_path={selectedFavFilm !== null && selectedFavFilm.poster_path}
+                posterBaseURL={selectedFavFilm !== null && posterBaseURL}
+                backdrop_path={selectedFavFilm !== null && selectedFavFilm.backdrop_path}
+                backdropBaseURL={selectedFavFilm !== null && backdropBaseURL}
+              />             
+          </>}        
       </div>
     </div>
   :
