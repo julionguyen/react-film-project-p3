@@ -11,7 +11,7 @@ export default function FilmRow({id, adult, imgURL, title, year, handleSelectFil
                     ?
                         <img src={TMDB_NO_POSTER_URL} alt='Poster Not Available'/> 
                     :
-                        <img src={posterBaseURL+imgURL} alt="{film title} film poster" />
+                        <img src={`${posterBaseURL}${imgURL}`} alt="{film title} film poster" />
                 }
             </button>
             

@@ -14,7 +14,7 @@ function FilmDetail({adult, title, tagline, overview, poster_path, posterBaseURL
             ?
               <img src={TMDB_NO_IMAGE_URL} alt='Backdrop Not Available'/>
             :
-              <img src={backdropBaseURL+backdrop_path} alt={title} />
+              <img src={`${backdropBaseURL}${backdrop_path}`} alt={title} />
           }
 
           
